@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScheduleSphere</title>
+    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/scheduler.css">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Placeholder for dynamically added events -->
+    </div>
+    <div id="emptyMessage">Nothing to show here.</div>
+    <!-- Button to add new event -->
+    <button id="addEventButton" class="fa fa-plus"></button>
+    <!-- Modal for adding new event -->
+    <div id="newEventModal" style="display:none;">
+        <form action="http://localhost:3000/schedule" method="post">
+            <label for="name">Event Name:</label><br>
+            <input type="text" id="name" name="name"><br>
+            <label for="time">Time:</label><br>
+            <input type="text" id="time" name="time"><br>
+            <label for="location">Location:</label><br>
+            <input type="text" id="location" name="location"><br>
+            <label for="description">Description:</label><br>
+            <input type="text" id="description" name="description"><br>
+            <label for="date">Date:</label><br>
+            <input type="date" id="date" name="date"><br>
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+    <script>
+        $(document).ready(function () {
+            $('#addEventButton').click(function () {
+                $('#newEventModal').show();
+            });
+            $('#closeModal').click(function () {
+                $('#newEventModal').hide();
+            });
+            $('#saveEvent').click(function () {
+                var date = $('#eventDate').val();
+                var month = $('#eventMonth').val();
+                var name = $('#eventName').val();
+                var day = $('#eventDay').val();
+                var time = $('#eventTime').val();
+                var location = $('#eventLocation').val();
+                var description = $('#eventDescription').val();
+                clearForm();
+                updateEmptyMessageDisplay();
+            });
+            function clearForm() {
+                $('#eventDate').val('');
+                $('#eventMonth').val('');
+                $('#eventName').val('');
+                $('#eventDay').val('');
+                $('#eventTime').val('');
+                $('#eventLocation').val('');
+                $('#eventDescription').val('');
+            }
+            function updateEmptyMessageDisplay() {
+                if ($('.row.row-striped').length === 0) {
+                    $('#emptyMessage').show();
+                } else {
+                    $('#emptyMessage').hide();
+                }
+            }
+            // Initially check if there are any events
+            // $(window).on('load', function() {
+            // updateEmptyMessageDisplay();
+            // });
+            updateEmptyMessageDisplay();
+        });
+        $.ajax({
+            url: 'http://localhost:3000/schedule', // replace with your endpoint
+            type: 'GET',
+            xhrFields: {
+                withCredentials: true
+            },
+            success: function (data) {
+                // Assuming data is an array of events
+                let events = data;
+                let container = $(".container");
+                container.empty(); // Clear the container
+                // Add each event to the container
+                events.forEach(function (event) {
+                    var newEventHtml =
+                        `
+<div class="row row-striped">
+<div class="col-2 text-right">
+<h1 class="display-4"><span class="badge badge-
+secondary">${event.date}</span></h1>
+<h2>${event.month}</h2>
+</div>
+<div class="col-10">
+<h3>${event.name}</h3>
+<ul class="list-inline">
+<li class="list-inline-item"><i class="fa fa-
+calendar-o" aria-hidden="true"></i> ${event.day}</li>
+<li class="list-inline-item"><i class="fa fa-
+clock-o" aria-hidden="true"></i> ${event.time}</li>
+<li class="list-inline-item"><i class="fa fa-
+location-arrow" aria-hidden="true"></i> ${event.location}</li>
+</ul>
+<p>${event.description}</p>
+</div>
+</div>`;
+                    container.append(newEventHtml);
+                });
+            },
+            error: function (error) {
+                console.error(error);
+            }
+        });
+    </script>
+</body>
+
+</html>

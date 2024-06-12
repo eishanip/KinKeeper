@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <link rel="stylesheet" href="/styles/expense_tracker.css">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Expense Tracker</h1>
+        </header>
+        <form id="expense-form" action="http://localhost:3000/expense" method="post">
+            <div class="form-group">
+                <label for="expense-name">Expense Name:</label>
+                <input type="text" id="expense-name" name="expense" placeholder="E.g., Coffee" required>
+            </div>
+            <div class="form-group">
+                <label for="expense-amount">Amount ($):</label>
+                <input type="number" id="expense-amount" name="amount" placeholder="E.g., 5.00" required min="0.01"
+                    step="0.01">
+            </div>
+            <button type="submit" class="add-btn">Add Expense</button>
+        </form>
+        <section class="expense-table">
+            <table aria-label="Expense list">
+                <thead>
+                    <tr>
+                        <th>Expense Name</th>
+                        <th>Amount</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="expense-list"></tbody>
+            </table>
+        </section>
+        <div class="total-amount">
+            <strong>Total:</strong>
+            $<span id="total-amount">0</span>
+        </div>
+        <!-- <button id="export-btn">Export to JSON</button> -->
+    </div>
+</body>
+<script>
+    $.ajax({
+        url: 'http://localhost:3000/expense', // replace with your endpoint
+        type: 'GET',
+        xhrFields: {
+            withCredentials: true
+        },
+        success: function (data) {
+            // handle the data here
+            console.log(data);
+            if (data === 'You have no expenses') {
+                var newRow = $("<tr>");
+                var noExpenseData = $("<td>").attr("colspan", 3).css({
+                    "text-align": 'center', 'color': 'green'
+                }).text("You have no expenses");
+                newRow.append(noExpenseData);
+                $("#expense-list").append(newRow);
+            }
+            else {
+                // Clear the table body
+                $("#expense-list").empty();
+                // Initialize total amount
+                var totalAmount = 0;
+                // Iterate over each expense in the data
+                $.each(data, function (index, expense) {
+                    // Create a new table row
+                    var newRow = $("<tr align='center'>");
+                    // Create and append table data for expense name
+                    var nameData = $("<td>").text(expense.expense);
+                    newRow.append(nameData);
+                    // Create and append table data for expense amount
+                    var amountData = $("<td>").text(expense.amount);
+                    newRow.append(amountData);
+                    // Add the expense amount to the total amount
+                    totalAmount += parseFloat(expense.amount);
+                    // Create and append table data for action
+                    var actionData = $("<td>").html('<button class="delete-btn" data-id="' + expense._id + '">Delete</button>');
+                    newRow.append(actionData);
+                    // Append the new row to the table body
+                    $("#expense-list").append(newRow);
+                });
+                // Update the total amount in the HTML
+                $("#total-amount").text(totalAmount.toFixed(2));
+            }
+        },
+        error: function (error) {
+            // handle errors here
+            console.error(error);
+        }
+    });
+    $(document).on('click', '.delete-btn', function () {
+        let deletion = $(this).data('id');
+        $.ajax({
+            url: 'http://localhost:3000/expense/' + deletion,
+            type: 'DELETE',
+            xhrFields: {
+                withCredentials: true
+            },
+            success: function (response) {
+                location.reload()
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.log('AJAX call failed.');
+                console.log('Status: ' + textStatus);
+                console.log('Error: ' + errorThrown);
+            }
+        });
+    });
+</script>
+
+</html>

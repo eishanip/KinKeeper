@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <script src="https://kit.fontawesome.com/16b1be2a30.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <link rel="stylesheet" href="../styles/task_manager.css">
+</head>
+
+<body>
+    <main>
+        <h1 id="head">
+            Hello
+        </h1>
+        <p id="quote">
+            "Embrace the sunshine in your soul and let your smile paint the world
+            in bright hues."
+        </p>
+        <div class="functions">
+            <div id="tskmgr">
+                <section class="section-view">
+                    <h2 class="centered-title">Your Pending Tasks</h2>
+                    <div class="centered-container no-task-message">
+                    </div>
+                    <ul id="task-list" class="centered-container"></ul>
+                    <button id="button-add" class="button-add animation-expand">+</button>
+                </section>
+                <section class="section-add-edit" style="display: none;">
+                    <h2 class="centered-title form-create-mode">Add a New
+                        Task</h2>
+                    <div class="centered-container">
+                        <form id="form">
+                            <label for="task">Task Name:</label><br>
+                            <input type="text" id="task" name="task" required><br>
+                            <label for="deadline">Deadline:</label><br>
+                            <input type="date" id="deadline" name="deadline" required><br>
+                            <label for="description">Description:</label><br>
+                            <textarea id="description" name="description" required></textarea><br>
+                            <label for="priority">Priority:</label><br>
+                            <input type="number" id="priority" name="priority" min="1" max="5" required><br>
+                            <input type="submit" value="Submit">
+                        </form>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+</body>
+<script>
+    $(document).ready(function () {
+        $('#head').text('Welcome back,');
+        $("#button-add").on("click", () => {
+            $(".section-add-edit").show();
+            $(".section-view").hide();
+        });
+        $(document).on('click', '#del', function () {
+            console.log("hi")
+            let deletion = $(this).data('id');
+            $.ajax({
+                url: 'http://localhost:3000/tasks/' + deletion,
+                type: 'DELETE',
+                xhrFields: {
+                    withCredentials: true
+                },
+                success: function (response) {
+                    location.reload()
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.log('AJAX call failed.');
+                    console.log('Status: ' + textStatus);
+                    console.log('Error: ' + errorThrown);
+                }
+            });
+        });
+        $.ajax({
+            url: "http://localhost:3000/tasks",
+            type: "GET",
+            xhrFields: {
+                withCredentials: true
+            },
+            success: function (response) {
+                if (response === "You don't have any pending tasks at the moment.") {
+                    $(".no-task-message").css({
+                        "text-align": 'center', 'color': 'green'
+                    }).text("You don't have any tasks for the moment.");
+                } else {
+                    // Assuming response is an array of tasks
+                    let tasks = response;
+                    let taskList = $("#task-list");
+                    taskList.empty(); // Clear the task list
+                    // Add each task to the task list
+                    tasks.forEach(function (task) {
+                        let bgColor =
+                            '';
+                        switch (task.priority) {
+                            case 1:
+                                bgColor = '#31a400';
+                                break;
+                            case 2:
+                                bgColor = 'orange';
+                                break;
+                            case 3:
+                                bgColor = 'red';
+                                break;
+                            default:
+                                bgColor = 'white';
+                        }
+                        taskList.append(`
+<li class='li-item' style='background-color:
+${bgColor};'>
+<span class='task-name'>${task.task}</span>
+<br>
+<div style="display:flex; justify-content:
+space-between">
+<span class='task-deadline'>Due:
+${task.deadline.slice(0,
+                            -14)}</span>
+<button id="del" data-id="${task._id}"><i
+class="fa-solid fa-trash"></i></button>
+</div>
+</li>
+`);
+                    });
+                }
+            },
+            error: function (error) {
+                console.error(error);
+            }
+        });
+        $("#form").on("submit", function (event) {
+            event.preventDefault();
+            let taskData = {
+                task: $("#task").val(),
+                deadline: $("#deadline").val(),
+                description: $("#description").val(),
+                priority: $("#priority").val()
+            };
+            $.ajax({
+                url: "http://localhost:3000/tasks", // hardcoded URL
+                type: "POST", // hardcoded method
+                xhrFields: {
+                    withCredentials: true
+                },
+                data: taskData,
+                success: function (response) {
+                    location.reload()
+                    console.log("Success callback executed");
+                    // handle the response here
+                    console.log(response);
+                    $(".section-add-edit").hide();
+                    $(".section-view").show();
+                },
+                error: function (error) {
+                    // handle errors here
+                    console.error(error);
+                }
+            });
+        });
+    });
+</script>
+
+</html>

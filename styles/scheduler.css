@@ -1,0 +1,88 @@
+@import url('https://fonts.googleapis.com/css2?family=Margarine&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+
+body {
+    background-color: #f0f7f4;
+    margin: 0 20px;
+    font-family: 'Outfit';
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+nav ul {
+    display: flex;
+    text-decoration: none;
+    list-style-type: none;
+    column-gap: 60px;
+}
+
+nav ul a {
+    text-decoration: none;
+    color: black;
+}
+
+.logo {
+    font-family: Margarine;
+    color: #70abaf;
+    font-size: 24px;
+}
+
+nav div {
+    border: 2px solid #70abaf;
+    padding: 5px 15px;
+    border-radius: 30px;
+    transition: 0.3s ease-out;
+}
+
+nav div a {
+    text-decoration: none;
+    transition: 0.3s ease-out;
+}
+
+nav div:hover {
+    background-color: #70abaf;
+}
+
+nav div a:hover {
+    color: white;
+}
+
+.row-striped:nth-of-type(odd) {
+    border-left: 4px #000000 solid;
+}
+
+.row-striped:nth-of-type(odd):hover {
+    background-color: white;
+}
+
+.row-striped:nth-of-type(even) {
+    background-color: #f0f7f4;
+    border-left: 4px solid;
+}
+
+.row-striped {
+    padding: 15px 0;
+}
+
+.row {
+    padding: 10px 30px;
+}
+
+.row h1 {
+    font-size: 38px;
+}
+
+.row h2 {
+    font-size: 28px;
+    margin-top: -25px;
+}
+
+.row h3 {
+    font-weight: 400;
+    font-size: 40px;
+    margin-top: -16px;
+}

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login|KinKeeper</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f0f7f4;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .container {
+            background-color: #ffffff;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            margin: auto;
+            /* Center the container */
+            margin-top: 20vh;
+            /* Adjust based on screen height */
+        }
+
+        .container h2 {
+            font-size: 36px;
+            font-weight: 700;
+            color: #70abaf;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .form-control {
+            border: 1px solid #70abaf;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .form-control:focus {
+            border-color: #0056b3;
+            box-shadow: none;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 10px;
+            background-color: #70abaf;
+            color: #fff;
+            width: 50%;
+            margin: 0 auto;
+            display: block;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+
+        .signup-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .signup-link a {
+            color: #70abaf;
+            text-decoration: none;
+        }
+
+        .signup-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2 class="text-center mb-4">Login</h2>
+        <form id="loginForm">
+            <div class="form-group">
+                <input type="text" class="form-control" id="userID" name="userid" placeholder="User ID">
+            </div>
+            <div class="form-group">
+                <input type="password" class="form-control" id="password" name="password" placeholder="Password">
+            </div>
+            <button type="submit" class="btn">Login</button>
+            <span id="warning"></span>
+        </form>
+        <div class="text-center mt-3 signup-link">
+            New to KinKeeper? Click <a href="http://localhost:63342/webProject/pages/signup_3.html?_ijt=uh63ah9cof86c
+qtvsmittsuf8s&_ij_reload=RELOAD_ON_SAVE">here</a> to sign up.
+        </div>
+    </div>
+</body>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        let flag = false;
+        function toggleButton() {
+            if (!flag) {
+                $('button[type="submit"]').prop('disabled', true);
+            } else {
+                $('button[type="submit"]').prop('disabled', false);
+            }
+        }
+        toggleButton();
+        $('#userID, #password').on('input', function () {
+            // Check if both fields have values
+            if ($('#userID').val().trim() !== '' &&
+                $('#password').val().trim() !== '') {
+                flag = true;
+            } else {
+                flag = false;
+            }
+            // Update button state
+            toggleButton();
+        })
+        $('#loginForm').on('submit', function (event) {
+            event.preventDefault();
+            var formData = {
+                userid: $('#userID').val(),
+                password: $('#password').val()
+            };
+            $.ajax({
+                url: 'http://localhost:3000/login',
+                type: 'POST',
+                xhrFields: {
+                    withCredentials: true
+                },
+                data: formData,
+                success: function (response) {
+                    $('#warning').hide();
+                    window.location.href =
+                        'http://localhost:63342/webProject/pages/dashboard.html?_ijt=melpap39kj34fcg2kfehjc1quk & _ij_reload=RELOAD_ON_SAVE#!/dashboard';
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    if (jqXHR.status === 401) {
+                        $('#warning').empty();
+                        $('#warning').text('Invalid Credentials').css({
+                            'color': 'red',
+                            'margin-left': '105px',
+                        });
+                    }
+                }
+            });
+        });
+    });
+</script>
+
+</html>

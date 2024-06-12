@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/doc_manage.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular-route.min.js"></script>
+    <script src="https://kit.fontawesome.com/16b1be2a30.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <h1 class="page-heading">FileFellow</h1>
+    <div class="container">
+        <div class="category">
+            <img src="/images/electronics_icon.png" alt="Electronics">
+            <h2>Electronics</h2>
+        </div>
+        <div class="category">
+            <img src="/images/groceries_icon.png" alt="Groceries & Supplies">
+            <h2>Groceries</h2>
+        </div>
+        <div class="category">
+            <img src="/images/health_icon.png" alt="Health & Wellness">
+            <h2>Health</h2>
+        </div>
+        <div class="category">
+            <img src="/images/legal_icon.png" alt="Legal & Administrative">
+            <h2>Legal</h2>
+        </div>
+        <div class="category">
+            <img src="/images/home_services_icon.png" alt="Home Services">
+            <h2>Home</h2>
+        </div>
+        <div class="category">
+            <img src="/images/payments_icon.png" alt="Payments">
+            <h2>Payments</h2>
+        </div>
+        <div class="category">
+            <img src="/images/contacts_icon.png" alt="Maintenance & Repairs">
+            <h2>Maintenance</h2>
+        </div>
+        <div class="category">
+            <img src="/images/travel_icon.png" alt="Travel & Vacations">
+            <h2>Travel</h2>
+        </div>
+    </div>
+    <!--<button class="btn">Upload New File</button>-->
+    <!-- Popup window -->
+    <div id="popup" style="display: none;" class="popup">
+        <button class="close-btn">X</button>
+        <form class="fileUpload" action="http://localhost:3000/">
+            <input type="file" id="fileInput" accept=".pdf,.doc,.docx,.txt">
+            <select id="categorySelect">
+                <option value="electronics">Electronics</option>
+                <option value="groceries">Groceries</option>
+                <option value="health">Health</option>
+                <option value="legal">Legal</option>
+                <option value="home">Home</option>
+                <option value="payments">Payments</option>
+                <option value="maintenance">Maintenance</option>
+                <option value="travel">Travel</option>
+            </select>
+            <button id="uploadButton" type="submit">Upload</button>
+        </form>
+    </div>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $(".category").click(function () {
+                var category = $(this).find('h2').text().toLowerCase();
+                $.ajax({
+                    url: "http://localhost:3000/" + category + "/filenames",
+                    type: "GET",
+                    xhrFields: {
+                        withCredentials: true
+                    },
+                    success: function (response) {
+                        var fileList =
+                            "";
+                        if (response.length === 0) {
+                            fileList = "<p style='color:red'>No files uploaded yet.</p > ";
+                        } else {
+                            for (var i = 0; i < response.length; i++) {
+                                fileList += "<p>" + response[i] + " <a href = 'http://localhost:3000/download/" + response[i] + "' > <i class='fa-solidfa-download'></i></a ></p > ";
+                            }
+                        }
+                        var uploadForm = `
+                            <button class="btn">Upload New File</button>
+                            <div id="uploadForm" style="display: none;">
+                                <form class="fileUpload" action="http://localhost:3000/${category}/upload" method="post" enctype="multipart/form-data">
+                                    <input type="file" id="fileInput" name="file" accept=".pdf,.doc,.docx,.txt">
+                                    <button id="uploadButton" type="submit">Upload<button>
+                                </form>
+                                </div>`;
+                        $("#popup").html(fileList + uploadForm);
+                        $("#popup").append('<button class="close-btn"><i class= "fa-solid fa-xmark" ></i ></button > ');
+                        $("#popup").show();
+                        $(".btn").click(function () {
+                            $("#uploadForm").show();
+                            $(".btn").hide();
+                        });
+                    },
+                    error: function (error) {
+                        console.log("Error:", error);
+                    }
+                });
+            });
+            $(document).on('click', '.close-btn', function () {
+                $("#popup").hide();
+            });
+            $(".btn").click(function () {
+                $("#popup").show();
+                $(".btn").hide();
+            });
+            $(".close-btn").click(function (event) {
+                $("#popup").hide();
+                $(".btn").show();
+                event.stopPropagation();
+            });
+            $(".fileUpload").on("submit", function (event) {
+                event.preventDefault();
+                var file = $("#fileInput").prop("files")[0];
+                var fileName = $("#fileNameInput").val();
+                var category = $("#categorySelect").val();
+                console.log("File:", file);
+                console.log("File Name:", fileName);
+                console.log("Category:", category);
+            });
+        });
+    </script>
+</body>
+
+</html>

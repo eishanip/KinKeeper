@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup|KinKeeper</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/styles/signup.css">
+</head>
+
+<body>
+    <div class="container">
+        <h2 class="text-center mb-4">Sign Up</h2>
+        <div class="constraints">Note: All fields are required.</div><br>
+        <form id="signupForm" action="http://localhost:3000/register" method="post">
+            <div class="row">
+                <div class="col">
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="firstName" name="fName" placeholder="First Name">
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="lastName" name="lName" placeholder="Last Name">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <input type="email" class="form-control" id="email" name="email" placeholder="Email">
+            </div>
+            <div class="form-group">
+                <input type="tel" class="form-control" id="phoneNumber" name="phone" placeholder="Phone Number">
+                <small class="constraints">*Must contain only 10 digits</small>
+            </div>
+            <div class="form-group">
+                <div>
+                    Gender:
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="gender" id="male" value="male">
+                    <label class="form-check-label" for="male">Male</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="gender" id="female" value="female">
+                    <label class="form-check-label" for="female">Female</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="gender" id="other" value="other">
+                    <label class="form-check-label" for="other">Other</label>
+                </div> <br>
+            </div>
+            <div class="form-group">
+                <label for="dob">Date of Birth:</label>
+                <input type="date" class="form-control" name="dob" id="dob">
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-control" name="userid" id="userID" placeholder="User ID">
+            </div>
+            <div class="form-group">
+                <input type="password" class="form-control" name="password" id="password" placeholder="Password">
+                <small class="constraints">*Should contain at least 1 letter, 1
+                    number, 1 special character</small>
+            </div>
+            <div class="form-group">
+                <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm Password">
+                <small class="constraints"></small>
+            </div>
+            <button type="submit" class="btn btn-block">Signup</button>
+        </form>
+        <div class="text-center mt-3">
+            Already a user? Click <a href="http://localhost:63342/pages/login_3.html?_ijt=rms41if9c8h4ea84c58b5vlo4
+n&_ij_reload=RELOAD_ON_SAVE">here</a> to login.
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            let flag = false;
+            function toggleButton() {
+                if (!flag) {
+                    $('button[type="submit"]').prop('disabled', true);
+                } else {
+                    $('button[type="submit"]').prop('disabled', false);
+                }
+            }
+            toggleButton();
+            $('#firstName, #lastName, #email, #phoneNumber, #dob, #userID, #password, #confirmPassword').on('blur', function () {
+                // Check if all fields have values
+                if ($('#firstName').val().trim() !== '' && $('#lastName').val().trim()
+                    !== '' && $('#email').val().trim() !== '' && $('#phoneNumber').val().trim()
+                    !== '' && $('#dob').val().trim() !== '' && $('#userID').val().trim() !== '' &&
+                    $('#password').val().trim() !== '' && $('#confirmPassword').val().trim() !==
+                    '') {
+                    // Validate password
+                    var password = $('#password').val();
+                    var passwordRegex = /^(?=. * [a - z])(?=.* [A - Z])(?=.*\d).{ 8,} $ /;
+                    if (!passwordRegex.test(password)) {
+                        alert('Password must contain at least 1 uppercase letter, 1 lowercase letter, 1 number, 1 special character and be at least 10 characters long.');
+                        flag = false;
+                        return;
+                    }
+                    // Validate phone number
+                    var phoneNumber = $('#phoneNumber').val();
+                    var phoneRegex = /^\d{10}$/;
+                    if (!phoneRegex.test(phoneNumber)) {
+                        alert('Phone number must be exactly 10 digits.');
+                        flag = false;
+                        return;
+                    }
+                    var confirmPassword = $('#confirmPassword').val();
+                    if (password !== confirmPassword) {
+                        alert('Both passwords should be same!');
+                        flag = false;
+                        return;
+                    }
+                    flag = true;
+                } else {
+                    flag = false;
+                }
+                // Update button state
+                toggleButton();
+            });
+            $('#signupForm').on('submit', function (event) {
+                event.preventDefault();
+                var formData = {
+                    fName: $('#firstName').val(),
+                    lName: $('#lastName').val(),
+                    email: $('#email').val(),
+                    phone: $('#phoneNumber').val(),
+                    gender: $('input[name="gender"]:checked').val(),
+                    dob: $('#dob').val(),
+                    userid: $('#userID').val(),
+                    password: $('#password').val()
+                };
+                console.log(formData);
+                $.ajax({
+                    url: 'http://localhost:3000/register',
+                    type: 'POST',
+                    xhrFields: {
+                        withCredentials: true
+                    },
+                    data: formData,
+                    success: function (response) {
+                        window.location.href =
+                            'http://localhost:63342/webProject/pages/dashboard.html?_ijt=melpap39kj34fcg2kfehjc1quk&_ij_reload=RELOAD_ON_SAVE#!/dashboard';
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        if (jqXHR.status === 401) {
+                            var message = $('<span>').text('This userid already exists').css({
+                                'color': 'red',
+                                'margin-left': '105px',
+                            });
+                            $('#signupForm').append(message);
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>
